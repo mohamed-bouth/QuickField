@@ -10,7 +10,7 @@ class Field extends Model
         'user_id',
         'name',
         'description',
-        'image_url',
+        'image_path',
         'localisation',
         'type',
         'status'

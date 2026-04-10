@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->string('name');
             $table->string('description');
-            $table->string('image_url');
+            $table->string('image_path');
             $table->string('localisation');
             $table->enum('type' , ['5v5' , '7v7']);
             $table->enum('status' , ['active' , 'inactive']);

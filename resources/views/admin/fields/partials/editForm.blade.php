@@ -1,5 +1,6 @@
-<form action="{{ route('admin.fields.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+<form action="{{ route('admin.fields.update', $field->id) }}" method="POST" enctype="multipart/form-data" class="space-y-8">
     @csrf
+    @method('PUT')
     <div class="space-y-6">
         <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">
             General Information
@@ -22,7 +23,7 @@
                     name="name"
                     placeholder="e.g. Main Stadium 5v5"
                     class="w-full rounded-xl border border-gray-300 focus:border-green-600 focus:ring-green-600 h-12 px-4 text-sm text-gray-700 outline-none"
-                    value="{{ old('name') }}"
+                    value="{{ old('name', $field->name) }}"
                 >
             </div>
 
@@ -33,7 +34,7 @@
                     name="localisation"
                     placeholder="e.g. North Complex, Paris"
                     class="w-full rounded-xl border border-gray-300 focus:border-green-600 focus:ring-green-600 h-12 px-4 text-sm text-gray-700 outline-none"
-                    value="{{ old('localisation') }}"
+                    value="{{ old('localisation', $field->localisation) }}"
                 >
             </div>
         </div>
@@ -46,7 +47,7 @@
                 placeholder="Provide details about the field surface, amenities, etc."
                 class="w-full rounded-xl border border-gray-300 focus:border-green-600 focus:ring-green-600 p-3 text-sm text-gray-700 outline-none"
                 
-            >{{ old('description') }}</textarea>
+            >{{ old('description', $field->description) }}</textarea>
         </div>
     </div>
 
@@ -62,8 +63,8 @@
                     name="type"
                     class="w-full rounded-xl border border-gray-300 focus:border-green-600 focus:ring-green-600 h-12 px-3 text-sm text-gray-700 bg-white outline-none"
                 >
-                    <option value="5v5" {{ old('type') === '5v5' ? 'selected' : '' }}>5v5</option>
-                    <option value="7v7" {{ old('type') === '7v7' ? 'selected' : '' }}>7v7</option>
+                    <option value="5v5" {{ old('type', $field->type) === '5v5' ? 'selected' : '' }}>5v5</option>
+                    <option value="7v7" {{ old('type', $field->type) === '7v7' ? 'selected' : '' }}>7v7</option>
                 </select>
             </div>
 
@@ -73,8 +74,8 @@
                     name="status"
                     class="w-full rounded-xl border border-gray-300 focus:border-green-600 focus:ring-green-600 h-12 px-3 text-sm text-gray-700 bg-white outline-none"
                 >
-                    <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>Active (Bookable)</option>
-                    <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive (Maintenance/Closed)</option>
+                    <option value="active" {{ old('status', $field->status) === 'active' ? 'selected' : '' }}>Active (Bookable)</option>
+                    <option value="inactive" {{ old('status', $field->status) === 'inactive' ? 'selected' : '' }}>Inactive (Maintenance/Closed)</option>
                 </select>
             </div>
         </div>
@@ -121,7 +122,7 @@
             type="submit"
             class="bg-green-600 hover:bg-green-700 text-white rounded-xl px-8 h-12 inline-flex items-center justify-center text-sm font-medium"
         >
-            Save Field
+            Update Field
         </button>
     </div>
 </form>
