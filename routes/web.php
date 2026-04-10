@@ -24,24 +24,25 @@ Route::middleware('guest')->group(function () {
 
 
 Route::middleware('auth')->group(function () {
-    Route::get('logout', [LoginController::class, 'destroy'])->name('logout');
-
-    Route::get('home', [DashboardController::class, 'index'])->name('public.dashboard.index');
-
-
-    
+        Route::get('logout', [LoginController::class, 'destroy'])->name('logout');
+    Route::middleware('role:player')->group(function () {
 
 
-    // Admin routes
-    Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard.index');
+        Route::get('home', [DashboardController::class, 'index'])->name('public.dashboard.index');
+    }); 
 
-    Route::get('admin/fields', [FieldController::class, 'index'])->name('admin.fields.index');
-    Route::get('admin/fields/create', [FieldController::class, 'create'])->name('admin.fields.create');
-    Route::post('admin/fields', [FieldController::class, 'store'])->name('admin.fields.store');
-    Route::get('admin/fields/{id}', [FieldController::class, 'show'])->name('admin.fields.show');
-    Route::get('admin/fields/{id}/edit', [FieldController::class, 'edit'])->name('admin.fields.edit');
-    Route::put('admin/fields/{id}', [FieldController::class, 'update'])->name('admin.fields.update');
-    Route::delete('admin/fields/{id}', [FieldController::class, 'destroy'])->name('admin.fields.destroy');
+    Route::middleware('role:super_admin|field_manager|field_guard')->group(function () {
+            Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard.index');
+
+            Route::get('admin/fields', [FieldController::class, 'index'])->name('admin.fields.index');
+            Route::get('admin/fields/create', [FieldController::class, 'create'])->name('admin.fields.create');
+            Route::post('admin/fields', [FieldController::class, 'store'])->name('admin.fields.store');
+            Route::get('admin/fields/{id}', [FieldController::class, 'show'])->name('admin.fields.show');
+            Route::get('admin/fields/{id}/edit', [FieldController::class, 'edit'])->name('admin.fields.edit');
+            Route::put('admin/fields/{id}', [FieldController::class, 'update'])->name('admin.fields.update');
+            Route::delete('admin/fields/{id}', [FieldController::class, 'destroy'])->name('admin.fields.destroy');
+    });
+
 });
 
 
