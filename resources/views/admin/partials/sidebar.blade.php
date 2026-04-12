@@ -39,6 +39,13 @@
                     </svg>
                     <span>Fields</span>
                 </a>
+                <a href="{{ route('admin.users.index') }}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6-3 6 3v12l-6 3-6-3-6 3V6l6-3 6 3"/>
+                    </svg>
+                    <span>Users</span>
+                </a>
             </div>
         </div>
     </div>

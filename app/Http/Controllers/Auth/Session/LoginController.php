@@ -23,6 +23,11 @@ class LoginController extends Controller
             
             $request->session()->regenerate();
 
+            $userRoles = Auth::user()->roles->first()->name;
+
+            if($userRoles === 'super_admin' || $userRoles === 'field_manager' || $userRoles === 'field_guard'){
+                return redirect()->route('admin.dashboard.index');
+            }
             return redirect()->route('public.dashboard.index');
         }
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\Session\RegisterController;
 use App\Http\Controllers\Public\DashboardController;
 use App\Http\Controllers\Admin\FieldController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\UserController;
 
 Route::middleware('guest')->group(function () {
 
@@ -41,6 +42,10 @@ Route::middleware('auth')->group(function () {
             Route::get('admin/fields/{id}/edit', [FieldController::class, 'edit'])->name('admin.fields.edit');
             Route::put('admin/fields/{id}', [FieldController::class, 'update'])->name('admin.fields.update');
             Route::delete('admin/fields/{id}', [FieldController::class, 'destroy'])->name('admin.fields.destroy');
+
+            Route::get('admin/users', [UserController::class, 'index'])->name('admin.users.index');
+            Route::get('admin/users/create', [UserController::class, 'create'])->name('admin.users.create');
+            Route::delete("admin/users/destroy/{id}", [UserController::class, 'destroy'])->name('admin.users.destroy');
     });
 
 });
