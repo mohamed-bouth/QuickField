@@ -28,4 +28,8 @@ class Field extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function prices(){
+        return $this->hasMany(Price::class);
+    }
+
 }

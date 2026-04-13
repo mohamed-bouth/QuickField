@@ -14,7 +14,7 @@
       <!-- Desktop Nav -->
       <nav class="hidden md:flex items-center gap-8">
         <a href="{{ route('public.dashboard.index') }}" class="text-sm font-medium text-green-600">Home</a>
-        <a href="" class="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Explore Fields</a>
+        <a href="{{ route('public.fields.index') }}" class="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Explore Fields</a>
       </nav>
 
       <!-- Desktop Actions -->

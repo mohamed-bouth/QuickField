@@ -4,9 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\Session\LoginController;
 use App\Http\Controllers\Auth\Session\RegisterController;
 use App\Http\Controllers\Public\DashboardController;
-use App\Http\Controllers\Admin\FieldController;
+use App\Http\Controllers\Public\FieldController;
+use App\Http\Controllers\Admin\FieldController as AdminFieldController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\ReservationController as AdminReservationController;
 
 Route::middleware('guest')->group(function () {
 
@@ -30,22 +32,26 @@ Route::middleware('auth')->group(function () {
 
 
         Route::get('home', [DashboardController::class, 'index'])->name('public.dashboard.index');
+        Route::get('explore', [FieldController::class, 'index'])->name('public.fields.index');
+        Route::get('field/details/{field}', [FieldController::class, 'show'])->name('public.fields.show');
     }); 
 
     Route::middleware('role:super_admin|field_manager|field_guard')->group(function () {
             Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard.index');
 
-            Route::get('admin/fields', [FieldController::class, 'index'])->name('admin.fields.index');
-            Route::get('admin/fields/create', [FieldController::class, 'create'])->name('admin.fields.create');
-            Route::post('admin/fields', [FieldController::class, 'store'])->name('admin.fields.store');
-            Route::get('admin/fields/{id}', [FieldController::class, 'show'])->name('admin.fields.show');
-            Route::get('admin/fields/{id}/edit', [FieldController::class, 'edit'])->name('admin.fields.edit');
-            Route::put('admin/fields/{id}', [FieldController::class, 'update'])->name('admin.fields.update');
-            Route::delete('admin/fields/{id}', [FieldController::class, 'destroy'])->name('admin.fields.destroy');
+            Route::get('admin/fields', [AdminFieldController::class, 'index'])->name('admin.fields.index');
+            Route::get('admin/fields/create', [AdminFieldController::class, 'create'])->name('admin.fields.create');
+            Route::post('admin/fields', [AdminFieldController::class, 'store'])->name('admin.fields.store');
+            Route::get('admin/fields/{id}', [AdminFieldController::class, 'show'])->name('admin.fields.show');
+            Route::get('admin/fields/{id}/edit', [AdminFieldController::class, 'edit'])->name('admin.fields.edit');
+            Route::put('admin/fields/{id}', [AdminFieldController::class, 'update'])->name('admin.fields.update');
+            Route::delete('admin/fields/{id}', [AdminFieldController::class, 'destroy'])->name('admin.fields.destroy');
 
-            Route::get('admin/users', [UserController::class, 'index'])->name('admin.users.index');
-            Route::get('admin/users/create', [UserController::class, 'create'])->name('admin.users.create');
-            Route::delete("admin/users/destroy/{id}", [UserController::class, 'destroy'])->name('admin.users.destroy');
+            Route::get('admin/users', [AdminUserController::class, 'index'])->name('admin.users.index');
+            Route::get('admin/users/create', [AdminUserController::class, 'create'])->name('admin.users.create');
+            Route::delete("admin/users/destroy/{id}", [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
+
+            Route::get("admin/reservations/", [AdminReservationController::class, 'index'])->name('admin.reservations.index');
     });
 
 });
