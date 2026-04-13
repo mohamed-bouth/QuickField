@@ -3,6 +3,7 @@
 use Livewire\Component;
 use Livewire\Attributes\Computed;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 new class extends Component {
     public string $search = '';
@@ -18,6 +19,46 @@ new class extends Component {
             ->with('roles')
             ->latest()
             ->get();
+    }
+
+    #[Computed]
+    public function roles()
+    {
+        return Role::query()
+            ->orderBy('name')
+            ->get();
+    }
+
+    public function updateStatus(int $userId, string $status): void
+    {
+        if (!in_array($status, ['active', 'inactive'], true)) {
+            return;
+        }
+
+        $user = User::find($userId);
+
+        if (!$user) {
+            return;
+        }
+
+        $user->update(['status' => $status]);
+    }
+
+    public function updateRole(int $userId, string $roleName): void
+    {
+        $role = Role::where('name', $roleName)->first();
+
+        if (!$role) {
+            return;
+        }
+
+        $user = User::find($userId);
+
+        if (!$user) {
+            return;
+        }
+
+        $user->syncRoles([$role->name]);
     }
 };
 ?>
@@ -81,27 +122,30 @@ new class extends Component {
                         </td>
 
                         <td class="px-6 py-4">
-                            @if ($user->status === 'active')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100 gap-1">
-                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                        <circle cx="12" cy="12" r="10"/>
-                                    </svg>
-                                    <span>Active</span>
-                                </span>
-                            @else
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-100 gap-1">
-                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                        <circle cx="12" cy="12" r="10"/>
-                                    </svg>
-                                    <span>Inactive</span>
-                                </span>
-                            @endif
+                            <div class="inline-flex items-center gap-3">
+                                <select
+                                    class="h-9 rounded-lg border border-gray-200 bg-white text-xs text-gray-700 px-2"
+                                    wire:change="updateStatus({{ $user->id }}, $event.target.value)"
+                                >
+                                    <option value="active" @selected($user->status === 'active')>Active</option>
+                                    <option value="inactive" @selected($user->status === 'inactive')>Inactive</option>
+                                </select>
+                            </div>
                         </td>
 
                         <td class="px-6 py-4">
-                            <span class="font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded-md text-xs border border-gray-200">
-                                {{ $user->roles->first()->name ?? 'No Role' }}
-                            </span>
+                            <div class="inline-flex items-center gap-3">
+                                <select
+                                    class="h-9 rounded-lg border border-gray-200 bg-white text-xs text-gray-700 px-2"
+                                    wire:change="updateRole({{ $user->id }}, $event.target.value)"
+                                >
+                                    @foreach ($this->roles as $role)
+                                        <option value="{{ $role->name }}" @selected($user->roles->first()?->name === $role->name)>
+                                            {{ $role->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </td>
 
                         <td class="px-6 py-4 text-gray-500">

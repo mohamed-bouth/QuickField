@@ -65,6 +65,17 @@
                 <h2 class="text-2xl font-bold text-gray-900 mb-2">Create your account</h2>
                 <p class="text-sm text-gray-500 mb-6">Sign up to start booking premium football fields</p>
 
+                @if ($errors->any())
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <h1>Validation Error</h1>
+                        <ul class="list-disc pl-5">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <form method="POST" action="{{ route('register') }}" class="space-y-4">
                     @csrf
                     <div>
