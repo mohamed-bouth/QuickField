@@ -76,26 +76,6 @@
                     </p>
                 </section>
 
-                <!-- Amenities -->
-                <section class="border-t border-gray-200 pt-8">
-                    <h2 class="mb-6 text-2xl font-bold text-gray-900">What this place offers</h2>
-
-                    <div class="grid grid-cols-1 gap-x-8 gap-y-4 text-gray-700 sm:grid-cols-2">
-                        @forelse($field->amenities ?? [] as $amenity)
-                            <div class="flex items-center gap-3 font-medium">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                </svg>
-                                <span>{{ $amenity }}</span>
-                            </div>
-                        @empty
-                            <div class="rounded-2xl border border-dashed border-gray-200 bg-white p-4 text-sm text-gray-400 sm:col-span-2">
-                                No amenities have been added yet.
-                            </div>
-                        @endforelse
-                    </div>
-                </section>
-
                 <!-- Location -->
                 <section id="map" class="border-t border-gray-200 pt-8">
                     <h2 class="mb-6 text-2xl font-bold text-gray-900">Location</h2>

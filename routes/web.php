@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\FieldController as AdminFieldController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ReservationController as AdminReservationController;
+use App\Http\Controllers\Admin\PriceController as AdminPriceController;
 
 Route::middleware('guest')->group(function () {
 
@@ -42,16 +43,18 @@ Route::middleware('auth')->group(function () {
             Route::get('admin/fields', [AdminFieldController::class, 'index'])->name('admin.fields.index');
             Route::get('admin/fields/create', [AdminFieldController::class, 'create'])->name('admin.fields.create');
             Route::post('admin/fields', [AdminFieldController::class, 'store'])->name('admin.fields.store');
-            Route::get('admin/fields/{id}', [AdminFieldController::class, 'show'])->name('admin.fields.show');
+            Route::get('/admin/fields/{field}', [AdminFieldController::class, 'show'])->name('admin.fields.show');
             Route::get('admin/fields/{id}/edit', [AdminFieldController::class, 'edit'])->name('admin.fields.edit');
             Route::put('admin/fields/{id}', [AdminFieldController::class, 'update'])->name('admin.fields.update');
             Route::delete('admin/fields/{id}', [AdminFieldController::class, 'destroy'])->name('admin.fields.destroy');
+            Route::put('/admin/fields/{field}/planning', [AdminFieldController::class, 'updatePlanning'])->name('admin.fields.planning.update');
 
             Route::get('admin/users', [AdminUserController::class, 'index'])->name('admin.users.index');
             Route::get('admin/users/create', [AdminUserController::class, 'create'])->name('admin.users.create');
             Route::delete("admin/users/destroy/{id}", [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
 
             Route::get("admin/reservations/", [AdminReservationController::class, 'index'])->name('admin.reservations.index');
+
     });
 
 });

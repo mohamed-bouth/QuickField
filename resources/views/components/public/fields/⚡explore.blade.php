@@ -171,7 +171,7 @@ new class extends Component {
                     </div>
                 </div>
 
-                <div class="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+                <!-- <div class="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
                     <div class="mb-4 flex items-center justify-between">
                         <h3 class="font-bold text-gray-900">Max Price</h3>
                         <span class="text-sm font-semibold text-green-700">{{ $maxPrice }} MAD</span>
@@ -190,7 +190,7 @@ new class extends Component {
                         <span>0</span>
                         <span>500+</span>
                     </div>
-                </div>
+                </div> -->
             </aside>
 
             <section class="flex-1">

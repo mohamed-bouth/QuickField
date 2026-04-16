@@ -108,6 +108,15 @@ new class extends Component {
 
                         <td class="px-6 py-4 text-right">
                             <div class="inline-flex items-center gap-2">
+
+                                <a href="{{ route('admin.fields.show', $field->id) }}"
+                                   class="px-3 py-2 rounded-lg text-sm text-green-600 hover:bg-green-100 hover:text-green-900 transition-colors inline-flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487a2.25 2.25 0 113.182 3.182L8.25 19.463 4.5 20.25l.787-3.75L16.862 4.487z"/>
+                                    </svg>
+                                    <span>show Details</span>
+                                </a>
+
                                 <a href="{{ route('admin.fields.edit', $field->id) }}"
                                    class="px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors inline-flex items-center gap-2">
                                     <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">

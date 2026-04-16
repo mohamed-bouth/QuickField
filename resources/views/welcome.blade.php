@@ -9,8 +9,8 @@
             </p>
             
             <div class="flex items-center gap-4">
-                <a href="#" class="px-6 py-3 text-white bg-green-500 rounded-full font-medium hover:bg-green-600 transition">Get Started</a>
-                <a href="#" class="px-6 py-3 text-green-500 border border-green-500 rounded-full font-medium hover:bg-green-50 transition">Browse Fields</a>
+                <a href="/login" class="px-6 py-3 text-white bg-green-500 rounded-full font-medium hover:bg-green-600 transition">Get Started</a>
+                <a href="/login" class="px-6 py-3 text-green-500 border border-green-500 rounded-full font-medium hover:bg-green-50 transition">Browse Fields</a>
             </div>
 
             <div class="flex items-center gap-12 pt-8">
