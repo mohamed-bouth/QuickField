@@ -32,7 +32,6 @@ class FieldController extends Controller
         ]);
 
         $imagePath = Storage::disk('r2')->putFile('fields', $request->file('image'), 'public');
-        $imageUrl = Storage::disk('r2')->url($imagePath);
 
         $field = Field::create([
             'user_id' => $request->user()->id,
@@ -109,7 +108,6 @@ class FieldController extends Controller
             }
 
             $imagePath = Storage::disk('r2')->putFile('fields', $request->file('image'), 'public');
-            $imageUrl = Storage::disk('r2')->url($imagePath);
         }
 
         $field->update([

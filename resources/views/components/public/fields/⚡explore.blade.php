@@ -15,32 +15,8 @@ new class extends Component {
 
     public function mount(): void
     {
-        $today = strtolower(now()->englishDayOfWeek);
-
-        $this->fields = Field::query()
+        $this->availableLocations = Field::query()
             ->where('status', 'active')
-            ->with([
-                'prices',
-                'reviews',
-            ])
-            ->withCount('reviews')
-            ->withAvg('reviews', 'rating')
-            ->get()
-            ->map(function ($field) use ($today) {
-                $todayPrice = $field->prices
-                    ->firstWhere('day_of_week', $today);
-
-                $minPrice = $field->prices->min('price');
-
-                $field->display_price = $todayPrice?->price ?? $minPrice ?? 0;
-                $field->display_rating = $field->reviews_avg_rating
-                    ? round($field->reviews_avg_rating, 1)
-                    : 0;
-
-                return $field;
-            });
-
-        $this->availableLocations = $this->fields
             ->pluck('localisation')
             ->filter()
             ->unique()
@@ -65,37 +41,58 @@ new class extends Component {
     public function getFilteredFieldsProperty(): array
     {
         $search = mb_strtolower(trim($this->search));
+        $today = strtolower(now()->englishDayOfWeek);
 
-        $filtered = collect($this->fields)
-            ->filter(function ($field) use ($search) {
-                if ($search === '') {
-                    return true;
-                }
+        $query = Field::query()
+            ->where('status', 'active')
+            ->with([
+                'prices',
+                'reviews',
+            ])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating');
 
-                return str_contains(mb_strtolower($field->name), $search)
-                    || str_contains(mb_strtolower($field->localisation), $search);
-            })
-            ->filter(function ($field) {
-                return $this->type === 'all' || $field->type === $this->type;
-            })
-            ->filter(function ($field) {
-                return empty($this->selectedLocations)
-                    || in_array($field->localisation, $this->selectedLocations, true);
-            })
-            ->filter(function ($field) {
-                return $field->display_price <= $this->maxPrice;
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('localisation', 'like', "%{$search}%");
             });
+        }
 
-        $filtered = match ($this->sortBy) {
-            'price_asc' => $filtered->sortBy('display_price'),
-            'price_desc' => $filtered->sortByDesc('display_price'),
-            'highest_rated' => $filtered->sortByDesc('display_rating'),
-            default => $filtered->sortByDesc(function ($field) {
+        if ($this->type !== 'all') {
+            $query->where('type', $this->type);
+        }
+
+        if (!empty($this->selectedLocations)) {
+            $query->whereIn('localisation', $this->selectedLocations);
+        }
+
+        $fields = $query->get()->map(function ($field) use ($today) {
+            $todayPrice = $field->prices
+                ->firstWhere('day_of_week', $today);
+
+            $minPrice = $field->prices->min('price');
+
+            $field->display_price = $todayPrice?->price ?? $minPrice ?? 0;
+            $field->display_rating = $field->reviews_avg_rating
+                ? round($field->reviews_avg_rating, 1)
+                : 0;
+
+            return $field;
+        })->filter(function ($field) {
+            return $field->display_price <= $this->maxPrice;
+        });
+
+        $fields = match ($this->sortBy) {
+            'price_asc' => $fields->sortBy('display_price'),
+            'price_desc' => $fields->sortByDesc('display_price'),
+            'highest_rated' => $fields->sortByDesc('display_rating'),
+            default => $fields->sortByDesc(function ($field) {
                 return ($field->display_rating * 1000) + $field->reviews_count;
             }),
         };
 
-        return $filtered->values()->all();
+        return $fields->values()->all();
     }
 };
 

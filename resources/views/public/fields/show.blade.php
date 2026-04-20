@@ -15,10 +15,10 @@
     </section>
 
     <div class="container mx-auto mt-8 px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
 
             <!-- Main Content -->
-            <div class="space-y-10 lg:col-span-2">
+            <div class="space-y-10 lg:col-span-1">
 
                 <!-- Header -->
                 <section>
@@ -186,7 +186,7 @@
                                 @csrf
 
                                 <!-- Date -->
-                                <div>
+                                <!-- <div>
                                     <label for="booking_date" class="mb-3 flex items-center gap-2 text-sm font-bold text-gray-900">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -201,7 +201,7 @@
                                         value="{{ old('booking_date') }}"
                                         class="h-14 w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 font-medium text-gray-900 outline-none transition focus:border-green-500 focus:bg-white focus:ring-2 focus:ring-green-500/20"
                                     >
-                                </div>
+                                </div> -->
 
                                 <!-- Time Slots -->
                                 <div>
@@ -212,32 +212,13 @@
                                         Select time
                                     </label>
 
-                                    <div class="grid grid-cols-3 gap-3">
-                                        @forelse($availableSlots ?? [] as $slot)
-                                            <label class="cursor-pointer">
-                                                <input
-                                                    type="radio"
-                                                    name="booking_time"
-                                                    value="{{ $slot['time'] }}"
-                                                    class="peer sr-only"
-                                                    {{ empty($slot['available']) ? 'disabled' : '' }}
-                                                >
+                                    <div
+                                        id="calendar"
+                                        data-field-id="{{ $field->id }}"
+                                        class="w-[600px] rounded-2xl bg-white p-4 shadow-sm"
+                                    ></div>
 
-                                                <span class="
-                                                    flex items-center justify-center rounded-xl border py-3 text-sm font-bold transition-all
-                                                    {{ empty($slot['available']) 
-                                                        ? 'cursor-not-allowed border-gray-100 bg-gray-50 text-gray-300' 
-                                                        : 'border-gray-200 bg-white text-gray-700 hover:border-green-500 hover:text-green-600 peer-checked:scale-105 peer-checked:border-green-600 peer-checked:bg-green-600 peer-checked:text-white peer-checked:shadow-md' }}
-                                                ">
-                                                    {{ $slot['time'] }}
-                                                </span>
-                                            </label>
-                                        @empty
-                                            <div class="col-span-3 rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-4 text-sm text-gray-400">
-                                                No time slots available for this day.
-                                            </div>
-                                        @endforelse
-                                    </div>
+                                    @vite('resources/js/manager-calendar.js')
                                 </div>
 
                                 <!-- Deposit Info -->

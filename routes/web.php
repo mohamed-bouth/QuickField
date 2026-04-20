@@ -35,6 +35,8 @@ Route::middleware('auth')->group(function () {
         Route::get('home', [DashboardController::class, 'index'])->name('public.dashboard.index');
         Route::get('explore', [FieldController::class, 'index'])->name('public.fields.index');
         Route::get('field/details/{field}', [FieldController::class, 'show'])->name('public.fields.show');
+        Route::get('/fields/{field}/reservations/events', [FieldController::class, 'events']);
+        Route::get('/manager/fields/{field}/blocks/create', [FieldController::class, 'takeHour'])->name('public.fields.blocks.create');
     }); 
 
     Route::middleware('role:super_admin|field_manager|field_guard')->group(function () {
