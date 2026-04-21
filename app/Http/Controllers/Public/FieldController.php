@@ -38,18 +38,5 @@ class FieldController extends Controller
                 ];
             })
         );
-    }
-
-    public function takeHour(Request $request , Field $field){
-        Reservation::create([
-            'field_id' => $field->id,
-            'user_id' => $request->user()->id,
-            'start_time' => \Carbon\Carbon::parse($request->start)->format('Y-m-d\TH:i'),
-            'end_time' => \Carbon\Carbon::parse($request->end)->format('Y-m-d\TH:i'),
-            'status' => 'pending',
-            'expires_at' => now()->addMinute(5)
-        ]);
-
-        return redirect()->back();
-    }
+    }   
 }

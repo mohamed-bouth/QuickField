@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ReservationController as AdminReservationController;
 use App\Http\Controllers\Admin\PriceController as AdminPriceController;
+use App\Http\Controllers\Public\ReservationController;
 
 Route::middleware('guest')->group(function () {
 
@@ -36,7 +37,7 @@ Route::middleware('auth')->group(function () {
         Route::get('explore', [FieldController::class, 'index'])->name('public.fields.index');
         Route::get('field/details/{field}', [FieldController::class, 'show'])->name('public.fields.show');
         Route::get('/fields/{field}/reservations/events', [FieldController::class, 'events']);
-        Route::get('/manager/fields/{field}/blocks/create', [FieldController::class, 'takeHour'])->name('public.fields.blocks.create');
+        Route::get('/manager/fields/{id}/blocks/create', [ReservationController::class, 'takeHour'])->name('public.fields.blocks.create');
     }); 
 
     Route::middleware('role:super_admin|field_manager|field_guard')->group(function () {
@@ -56,6 +57,8 @@ Route::middleware('auth')->group(function () {
             Route::delete("admin/users/destroy/{id}", [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
 
             Route::get("admin/reservations/", [AdminReservationController::class, 'index'])->name('admin.reservations.index');
+            Route::patch('admin/reservations/{reservation}/confirm', [AdminReservationController::class, 'confirm'])->name('admin.reservations.confirm');
+            Route::patch('admin/reservations/{reservation}/cancel', [AdminReservationController::class, 'cancel'])->name('admin.reservations.cancel');
 
     });
 
