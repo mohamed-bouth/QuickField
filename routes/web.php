@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ReservationController as AdminReservationController;
 use App\Http\Controllers\Admin\PriceController as AdminPriceController;
 use App\Http\Controllers\Public\ReservationController;
+use App\Http\Controllers\Public\ReviewController;
 
 Route::middleware('guest')->group(function () {
 
@@ -36,6 +37,9 @@ Route::middleware('auth')->group(function () {
         Route::get('home', [DashboardController::class, 'index'])->name('public.dashboard.index');
         Route::get('explore', [FieldController::class, 'index'])->name('public.fields.index');
         Route::get('field/details/{field}', [FieldController::class, 'show'])->name('public.fields.show');
+        Route::post('field/details/{field}/reviews', [ReviewController::class, 'store'])->name('public.fields.reviews.store');
+        Route::patch('field/details/{field}/reviews/{review}', [ReviewController::class, 'update'])->name('public.fields.reviews.update');
+        Route::delete('field/details/{field}/reviews/{review}', [ReviewController::class, 'destroy'])->name('public.fields.reviews.destroy');
         Route::get('/fields/{field}/reservations/events', [FieldController::class, 'events']);
         Route::get('/manager/fields/{id}/blocks/create', [ReservationController::class, 'takeHour'])->name('public.fields.blocks.create');
     }); 

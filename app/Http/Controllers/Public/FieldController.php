@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Field;
 use App\Models\Reservation;
-use Carbon\Constants\Format;
+use Illuminate\Support\Facades\Auth;
 
 class FieldController extends Controller
 {
@@ -15,7 +15,29 @@ class FieldController extends Controller
     }
 
     public function show(Field $field){
-        return view('public.fields.show', compact('field'));
+        $field->load([
+            'reviews' => fn ($query) => $query->with('user')->latest(),
+        ])->loadCount('reviews')
+            ->loadAvg('reviews', 'rating');
+
+        $canReview = false;
+
+        if (Auth::check()) {
+            $userId = Auth::id();
+
+            $hasCompletedReservation = Reservation::where('user_id', $userId)
+                ->where('field_id', $field->id)
+                ->where('status', 'completed')
+                ->exists();
+
+            $alreadyReviewed = $field->reviews()
+                ->where('user_id', $userId)
+                ->exists();
+
+            $canReview = $hasCompletedReservation && ! $alreadyReviewed;
+        }
+
+        return view('public.fields.show', compact('field', 'canReview'));
     }
 
     public function events(Request $request , Field $field){
