@@ -41,7 +41,11 @@ class FieldController extends Controller
     }
 
     public function events(Request $request , Field $field){
-        $reservations = Reservation::where('field_id' , $field->id)->get();
+        Reservation::expirePendingReservations();
+
+        $reservations = Reservation::where('field_id', $field->id)
+            ->activeBlocking()
+            ->get();
 
         return response()->json(
             $reservations->map(function ($reservation) {

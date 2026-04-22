@@ -16,6 +16,8 @@ class PaymentController extends Controller
 {
     public function createIntent(Request $request)
     {
+        Reservation::expirePendingReservations();
+
         $validated = $request->validate([
             'reservation_id' => ['required', 'integer', 'exists:reservations,id'],
         ]);
@@ -80,6 +82,8 @@ class PaymentController extends Controller
 
     public function confirm(Request $request)
     {
+        Reservation::expirePendingReservations();
+
         $validated = $request->validate([
             'reservation_id' => ['required', 'integer', 'exists:reservations,id'],
             'payment_intent_id' => ['required', 'string'],
@@ -122,7 +126,10 @@ class PaymentController extends Controller
 
         DB::transaction(function () use ($reservation, $price, $paidAmount) {
             if ($reservation->status === 'pending') {
-                $reservation->update(['status' => 'payed']);
+                $reservation->update([
+                    'status' => 'payed',
+                    'expires_at' => null,
+                ]);
             }
 
             Payment::updateOrCreate(
