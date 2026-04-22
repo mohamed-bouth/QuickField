@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('field/details/{field}/reviews/{review}', [ReviewController::class, 'destroy'])->name('public.fields.reviews.destroy');
         Route::get('fields/{field}/reservations/events', [FieldController::class, 'events']);
         Route::get('manager/fields/{id}/blocks/create', [ReservationController::class, 'takeHour'])->name('public.fields.blocks.create');
+        Route::get('my-reservations', [ReservationController::class, 'history'])->name('public.reservations.history');
 
         Route::post('payment/create-intent', [PaymentController::class, 'createIntent']);
         Route::post('payment/confirm', [PaymentController::class, 'confirm']);

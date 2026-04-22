@@ -13,8 +13,9 @@
 
       <!-- Desktop Nav -->
       <nav class="hidden md:flex items-center gap-8">
-        <a href="{{ route('public.dashboard.index') }}" class="text-sm font-medium text-green-600">Home</a>
+        <a href="{{ route('public.dashboard.index') }}" class="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Home</a>
         <a href="{{ route('public.fields.index') }}" class="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Explore Fields</a>
+        <a href="{{ route('public.reservations.history') }}" class="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">My Reservations</a>
       </nav>
 
       <!-- Desktop Actions -->
@@ -45,6 +46,7 @@
     <!-- Mobile Nav Static -->
     <div class="md:hidden bg-white border-t border-gray-100 px-4 pt-4 pb-6 space-y-4">
       <a href="{{ route('public.dashboard.index') }}" class="block px-3 py-3 rounded-xl text-base font-medium text-green-600 bg-green-50">Home</a>
+      <a href="" class="block px-3 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">Explore Fields</a>
       <a href="" class="block px-3 py-3 rounded-xl text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">Explore Fields</a>
 
       <div class="pt-4 border-t border-gray-100 flex flex-col gap-3">
