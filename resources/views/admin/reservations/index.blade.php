@@ -38,6 +38,22 @@
                         >
                     </div>
 
+                    <div>
+                        <label for="status" class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">Status</label>
+                        <select
+                            id="status"
+                            name="status"
+                            class="h-11 rounded-xl border border-gray-200 px-3 text-sm text-gray-900 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
+                        >
+                            <option value="">All statuses</option>
+                            @foreach($allowedStatuses as $status)
+                                <option value="{{ $status }}" @selected($selectedStatus === $status)>
+                                    {{ ucfirst($status) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <div class="flex items-center gap-2">
                         <button type="submit" class="h-11 rounded-xl bg-green-600 px-4 text-sm font-semibold text-white hover:bg-green-700">
                             Search

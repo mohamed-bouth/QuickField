@@ -55,6 +55,28 @@
                                     @else
                                         -
                                     @endif
+
+                                    @if($reservation->status === 'pending' && $reservation->expires_at && $reservation->expires_at->isFuture())
+                                        <div class="mt-2 flex items-center gap-2">
+                                            <a
+                                                href="{{ route('public.reservations.continue-payment', $reservation) }}"
+                                                class="inline-flex rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800"
+                                            >
+                                                Continue payment
+                                            </a>
+
+                                            <form method="POST" action="{{ route('public.reservations.cancel', $reservation) }}" onsubmit="return confirm('Cancel this reservation?');">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button
+                                                    type="submit"
+                                                    class="inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @endif
                                 </td>
                             </tr>
                         @empty

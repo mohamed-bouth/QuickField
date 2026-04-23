@@ -22,11 +22,63 @@ class ReservationController extends Controller
         return view('public.reservations.history', compact('reservations'));
     }
 
+    public function continuePayment(Request $request, Reservation $reservation)
+    {
+        Reservation::expirePendingReservations();
+
+        abort_unless((int) $reservation->user_id === (int) $request->user()->id, 403);
+
+        if (
+            $reservation->status !== 'pending'
+            || !$reservation->expires_at
+            || $reservation->expires_at->lte(now())
+        ) {
+            return redirect()
+                ->route('public.reservations.history')
+                ->with('error', 'This reservation can no longer be paid.');
+        }
+
+        $dayName = strtolower($reservation->start_time->format('l'));
+        $field = Field::with(['prices' => function ($query) use ($dayName) {
+                $query->where('day_of_week', $dayName);
+            }])->findOrFail($reservation->field_id);
+
+        $user = $request->user();
+
+        return view('public.fields.payment', compact('field', 'user', 'reservation'));
+    }
+
+    public function cancel(Request $request, Reservation $reservation)
+    {
+        Reservation::expirePendingReservations();
+
+        abort_unless((int) $reservation->user_id === (int) $request->user()->id, 403);
+
+        if ($reservation->status !== 'pending') {
+            return redirect()
+                ->route('public.reservations.history')
+                ->with('error', 'Only pending reservations can be cancelled.');
+        }
+
+        $reservation->update([
+            'status' => 'cancelled',
+            'expires_at' => null,
+        ]);
+
+        return redirect()
+            ->route('public.reservations.history')
+            ->with('success', 'Reservation cancelled successfully.');
+    }
+
     public function takeHour(Request $request , $id){
         Reservation::expirePendingReservations();
 
-        $start_time = Carbon::parse($request->start);
-        $end_time = Carbon::parse($request->end);
+        $start_time = Carbon::parse($request->start)
+            ->setTimezone(config('app.timezone'))
+            ->startOfMinute();
+        $end_time = Carbon::parse($request->end)
+            ->setTimezone(config('app.timezone'))
+            ->startOfMinute();
 
         $now = Carbon::now();
 
@@ -37,6 +89,7 @@ class ReservationController extends Controller
         if ($end_time->lte($start_time)) {
             return redirect()->route('public.fields.show', ['field' => $id])->with(['error' => 'Invalid reservation time range.']);
         }
+
 
         $dayName = strtolower($start_time->format('l'));
         $field = Field::with(['prices' => function ($query) use ($dayName) {
@@ -52,6 +105,7 @@ class ReservationController extends Controller
                     ->where('end_time', '>', $start_time);
             })
             ->exists();
+
 
         if ($hasConflict) {
             return redirect()->route('public.fields.show', ['field' => $id])->with(['error' => 'This slot is no longer available.']);

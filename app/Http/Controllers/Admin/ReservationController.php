@@ -9,15 +9,21 @@ use Illuminate\Http\Request;
 class ReservationController extends Controller
 {
     public function index(Request $request){
+        $allowedStatuses = ['pending', 'payed', 'confirmed', 'cancelled'];
+        $selectedStatus = $request->input('status');
+
         $reservations = Reservation::with(['user', 'field'])
             ->when($request->filled('date'), function ($query) use ($request) {
                 $query->whereDate('start_time', $request->date);
+            })
+            ->when(in_array($selectedStatus, $allowedStatuses, true), function ($query) use ($selectedStatus) {
+                $query->where('status', $selectedStatus);
             })
             ->latest()
             ->paginate(12)
             ->withQueryString();
 
-        return view('admin.reservations.index', compact('reservations'));
+        return view('admin.reservations.index', compact('reservations', 'allowedStatuses', 'selectedStatus'));
     }
 
     public function confirm(Reservation $reservation)

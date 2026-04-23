@@ -44,6 +44,8 @@ Route::middleware('auth')->group(function () {
         Route::get('fields/{field}/reservations/events', [FieldController::class, 'events']);
         Route::get('manager/fields/{id}/blocks/create', [ReservationController::class, 'takeHour'])->name('public.fields.blocks.create');
         Route::get('my-reservations', [ReservationController::class, 'history'])->name('public.reservations.history');
+        Route::get('reservation/{reservation}/continue', [ReservationController::class, 'continuePayment'])->name('public.reservations.continue-payment');
+        Route::patch('reservation/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('public.reservations.cancel');
 
         Route::post('payment/create-intent', [PaymentController::class, 'createIntent']);
         Route::post('payment/confirm', [PaymentController::class, 'confirm']);
