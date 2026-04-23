@@ -51,5 +51,5 @@
 
 1. Cloner le dépôt :
    ```bash
-   git clone [URL_DU_REPO]
+   git clone https://github.com/mohamed-bouth/QuickField.git
    cd quickfield

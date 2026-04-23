@@ -77,6 +77,107 @@
         </div>
     </section>
 
+    <section class="py-20 max-w-7xl mx-auto px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+                <h2 class="text-2xl font-bold text-gray-900 mb-3">Request Field Manager Account</h2>
+                <p class="text-gray-500 mb-6">Submit your information. The super admin will approve or reject your request.</p>
+
+                @if(session('success'))
+                    <div class="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                <form action="{{ route('manager-requests.store') }}" method="POST" class="space-y-4">
+                    @csrf
+                    <div>
+                        <label class="mb-1 block text-sm font-semibold text-gray-700" for="manager-name">Name</label>
+                        <input id="manager-name" type="text" name="name" value="{{ old('name') }}" class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-500/20" required>
+                        @error('name')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-sm font-semibold text-gray-700" for="manager-email">Email</label>
+                        <input id="manager-email" type="email" name="email" value="{{ old('email') }}" class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-500/20" required>
+                        @error('email')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-sm font-semibold text-gray-700" for="manager-phone">Phone Number</label>
+                        <input id="manager-phone" type="text" name="phone" value="{{ old('phone') }}" class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-500/20" required>
+                        @error('phone')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-sm font-semibold text-gray-700" for="manager-password">Password</label>
+                        <input id="manager-password" type="password" name="password" class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-500/20" required>
+                        @error('password')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-sm font-semibold text-gray-700" for="manager-password-confirmation">Confirm Password</label>
+                        <input id="manager-password-confirmation" type="password" name="password_confirmation" class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-500/20" required>
+                    </div>
+
+                    <button type="submit" class="w-full rounded-xl bg-green-600 px-5 py-3 text-sm font-semibold text-white hover:bg-green-700">
+                        Send Request
+                    </button>
+                </form>
+            </div>
+
+            <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+                <h2 class="text-2xl font-bold text-gray-900 mb-3">Check Request Status</h2>
+                <p class="text-gray-500 mb-6">Enter your request code (example: MGR-AB12CD34) to see activation state.</p>
+
+                <form action="{{ route('manager-requests.check') }}" method="GET" class="space-y-4">
+                    <div>
+                        <label class="mb-1 block text-sm font-semibold text-gray-700" for="request-code">Request Code</label>
+                        <input id="request-code" type="text" name="request_code" value="{{ request('request_code') }}" class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-green-500 focus:ring-2 focus:ring-green-500/20" required>
+                        @error('request_code')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <button type="submit" class="rounded-xl bg-gray-900 px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800">
+                        Check Status
+                    </button>
+                </form>
+
+                @if(request()->filled('request_code'))
+                    @if($statusLookup)
+                        <div class="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">
+                            <p><span class="font-semibold">Code:</span> {{ $statusLookup->request_code }}</p>
+                            <p><span class="font-semibold">Request Status:</span> {{ ucfirst($statusLookup->status) }}</p>
+                            @if($statusLookup->status === 'approved')
+                                <p><span class="font-semibold">Account:</span> {{ $statusLookup->user && $statusLookup->user->status === 'active' ? 'Activated' : 'Created but inactive' }}</p>
+                            @elseif($statusLookup->status === 'rejected')
+                                <p><span class="font-semibold">Account:</span> Not activated</p>
+                                @if($statusLookup->rejection_reason)
+                                    <p><span class="font-semibold">Reason:</span> {{ $statusLookup->rejection_reason }}</p>
+                                @endif
+                            @else
+                                <p><span class="font-semibold">Account:</span> Waiting for super admin decision</p>
+                            @endif
+                        </div>
+                    @else
+                        <div class="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+                            Request code not found. Please check and try again.
+                        </div>
+                    @endif
+                @endif
+            </div>
+        </div>
+    </section>
+
     <section class="bg-green-600 py-20 mt-12">
         <div class="max-w-4xl mx-auto text-center px-8">
             <h2 class="text-3xl font-bold text-white mb-4">Ready to Play?</h2>

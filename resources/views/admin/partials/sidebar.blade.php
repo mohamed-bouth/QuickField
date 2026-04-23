@@ -53,6 +53,15 @@
                     </svg>
                     <span>Reservations</span>
                 </a>
+                @if(auth()->user()?->hasRole('super_admin'))
+                    <a href="{{ route('admin.manager-requests.index') }}"
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                        </svg>
+                        <span>Manager Requests</span>
+                    </a>
+                @endif
             </div>
         </div>
     </div>

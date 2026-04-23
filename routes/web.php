@@ -13,12 +13,14 @@ use App\Http\Controllers\Admin\PriceController as AdminPriceController;
 use App\Http\Controllers\Public\ReservationController;
 use App\Http\Controllers\Public\ReviewController;
 use App\Http\Controllers\Public\PaymentController;
+use App\Http\Controllers\Public\ManagerAccountRequestController as PublicManagerAccountRequestController;
+use App\Http\Controllers\Admin\ManagerAccountRequestController as AdminManagerAccountRequestController;
 
 Route::middleware('guest')->group(function () {
 
-    Route::get('/', function () {
-        return view('welcome');
-    });
+    Route::get('/', [PublicManagerAccountRequestController::class, 'landing'])->name('manager-requests.landing');
+    Route::post('manager-account-requests', [PublicManagerAccountRequestController::class, 'store'])->name('manager-requests.store');
+    Route::get('manager-account-requests/check', [PublicManagerAccountRequestController::class, 'check'])->name('manager-requests.check');
 
     Route::get('register', [RegisterController::class, 'create'])->name('register');
 
@@ -79,6 +81,12 @@ Route::middleware('auth')->group(function () {
             Route::patch('admin/reservations/{reservation}/cancel', [AdminReservationController::class, 'cancel'])->name('admin.reservations.cancel');
 
     });
+
+            Route::middleware('role:super_admin')->group(function () {
+                Route::get('admin/manager-account-requests', [AdminManagerAccountRequestController::class, 'index'])->name('admin.manager-requests.index');
+                Route::patch('admin/manager-account-requests/{managerRequest}/approve', [AdminManagerAccountRequestController::class, 'approve'])->name('admin.manager-requests.approve');
+                Route::patch('admin/manager-account-requests/{managerRequest}/reject', [AdminManagerAccountRequestController::class, 'reject'])->name('admin.manager-requests.reject');
+            });
 
 });
 
