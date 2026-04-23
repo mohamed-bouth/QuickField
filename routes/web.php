@@ -38,54 +38,56 @@ Route::middleware('auth')->group(function () {
 
 
         Route::get('home', [DashboardController::class, 'index'])->name('public.dashboard.index');
-        Route::get('explore', [FieldController::class, 'index'])->name('public.fields.index');
-        Route::get('field/details/{field}', [FieldController::class, 'show'])->name('public.fields.show');
-        Route::post('field/details/{field}/reviews', [ReviewController::class, 'store'])->name('public.fields.reviews.store');
-        Route::patch('field/details/{field}/reviews/{review}', [ReviewController::class, 'update'])->name('public.fields.reviews.update');
-        Route::delete('field/details/{field}/reviews/{review}', [ReviewController::class, 'destroy'])->name('public.fields.reviews.destroy');
-        Route::get('fields/{field}/reservations/events', [FieldController::class, 'events']);
-        Route::get('manager/fields/{id}/blocks/create', [ReservationController::class, 'takeHour'])->name('public.fields.blocks.create');
-        Route::get('my-reservations', [ReservationController::class, 'history'])->name('public.reservations.history');
-        Route::get('reservation/{reservation}/continue', [ReservationController::class, 'continuePayment'])->name('public.reservations.continue-payment');
-        Route::patch('reservation/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('public.reservations.cancel');
+        Route::get('explore', [FieldController::class, 'index'])->middleware('permission:fields.browse')->name('public.fields.index');
+        Route::get('field/details/{field}', [FieldController::class, 'show'])->middleware('permission:fields.browse')->name('public.fields.show');
+        Route::post('field/details/{field}/reviews', [ReviewController::class, 'store'])->middleware('permission:reviews.create')->name('public.fields.reviews.store');
+        Route::patch('field/details/{field}/reviews/{review}', [ReviewController::class, 'update'])->middleware('permission:reviews.create')->name('public.fields.reviews.update');
+        Route::delete('field/details/{field}/reviews/{review}', [ReviewController::class, 'destroy'])->middleware('permission:reviews.create')->name('public.fields.reviews.destroy');
+        Route::get('fields/{field}/reservations/events', [FieldController::class, 'events'])->middleware('permission:fields.browse');
+        Route::get('manager/fields/{id}/blocks/create', [ReservationController::class, 'takeHour'])->middleware('permission:reservations.create')->name('public.fields.blocks.create');
+        Route::get('my-reservations', [ReservationController::class, 'history'])->middleware('permission:tickets.view')->name('public.reservations.history');
+        Route::get('reservation/{reservation}/continue', [ReservationController::class, 'continuePayment'])->middleware('permission:reservations.create')->name('public.reservations.continue-payment');
+        Route::patch('reservation/{reservation}/cancel', [ReservationController::class, 'cancel'])->middleware('permission:reservations.cancel')->name('public.reservations.cancel');
 
-        Route::post('payment/create-intent', [PaymentController::class, 'createIntent']);
-        Route::post('payment/confirm', [PaymentController::class, 'confirm']);
+        Route::post('payment/create-intent', [PaymentController::class, 'createIntent'])->middleware('permission:payments.deposit.pay');
+        Route::post('payment/confirm', [PaymentController::class, 'confirm'])->middleware('permission:payments.deposit.pay');
         Route::get('payment/success/{reservation}', function (\App\Models\Reservation $reservation) {
             abort_unless((int) $reservation->user_id === (int) request()->user()->id, 403);
 
             return redirect()
                 ->route('public.fields.show', $reservation->field_id)
                 ->with('success', 'Payment completed successfully.');
-        })->name('public.payment.success');
+        })->middleware('permission:payments.deposit.pay')->name('public.payment.success');
     }); 
 
     Route::middleware('role:super_admin|field_manager|field_guard')->group(function () {
-            Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard.index');
+            Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])
+                ->middleware('permission:finance.dashboard.view')
+                ->name('admin.dashboard.index');
 
-            Route::get('admin/fields', [AdminFieldController::class, 'index'])->name('admin.fields.index');
-            Route::get('admin/fields/create', [AdminFieldController::class, 'create'])->name('admin.fields.create');
-            Route::post('admin/fields', [AdminFieldController::class, 'store'])->name('admin.fields.store');
-            Route::get('admin/fields/{field}', [AdminFieldController::class, 'show'])->name('admin.fields.show');
-            Route::get('admin/fields/{id}/edit', [AdminFieldController::class, 'edit'])->name('admin.fields.edit');
-            Route::put('admin/fields/{id}', [AdminFieldController::class, 'update'])->name('admin.fields.update');
-            Route::delete('admin/fields/{id}', [AdminFieldController::class, 'destroy'])->name('admin.fields.destroy');
-            Route::put('admin/fields/{field}/planning', [AdminFieldController::class, 'updatePlanning'])->name('admin.fields.planning.update');
+            Route::get('admin/fields', [AdminFieldController::class, 'index'])->middleware('permission:fields.manage')->name('admin.fields.index');
+            Route::get('admin/fields/create', [AdminFieldController::class, 'create'])->middleware('permission:fields.manage')->name('admin.fields.create');
+            Route::post('admin/fields', [AdminFieldController::class, 'store'])->middleware('permission:fields.manage')->name('admin.fields.store');
+            Route::get('admin/fields/{field}', [AdminFieldController::class, 'show'])->middleware('permission:fields.manage')->name('admin.fields.show');
+            Route::get('admin/fields/{id}/edit', [AdminFieldController::class, 'edit'])->middleware('permission:fields.manage')->name('admin.fields.edit');
+            Route::put('admin/fields/{id}', [AdminFieldController::class, 'update'])->middleware('permission:fields.manage')->name('admin.fields.update');
+            Route::delete('admin/fields/{id}', [AdminFieldController::class, 'destroy'])->middleware('permission:fields.manage')->name('admin.fields.destroy');
+            Route::put('admin/fields/{field}/planning', [AdminFieldController::class, 'updatePlanning'])->middleware('permission:planning.manage')->name('admin.fields.planning.update');
 
-            Route::get('admin/users', [AdminUserController::class, 'index'])->name('admin.users.index');
-            Route::get('admin/users/create', [AdminUserController::class, 'create'])->name('admin.users.create');
-            Route::delete("admin/users/destroy/{id}", [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
+            Route::get('admin/users', [AdminUserController::class, 'index'])->middleware('role_or_permission:super_admin|staff.manage|users.blacklist.manage')->name('admin.users.index');
+            Route::get('admin/users/create', [AdminUserController::class, 'create'])->middleware('permission:staff.manage')->name('admin.users.create');
+            Route::delete("admin/users/destroy/{id}", [AdminUserController::class, 'destroy'])->middleware('role_or_permission:super_admin|staff.manage|users.blacklist.manage')->name('admin.users.destroy');
 
-            Route::get("admin/reservations/", [AdminReservationController::class, 'index'])->name('admin.reservations.index');
-            Route::patch('admin/reservations/{reservation}/confirm', [AdminReservationController::class, 'confirm'])->name('admin.reservations.confirm');
-            Route::patch('admin/reservations/{reservation}/cancel', [AdminReservationController::class, 'cancel'])->name('admin.reservations.cancel');
+            Route::get("admin/reservations/", [AdminReservationController::class, 'index'])->middleware('permission:planning.daily.view')->name('admin.reservations.index');
+            Route::patch('admin/reservations/{reservation}/confirm', [AdminReservationController::class, 'confirm'])->middleware('permission:planning.manage')->name('admin.reservations.confirm');
+            Route::patch('admin/reservations/{reservation}/cancel', [AdminReservationController::class, 'cancel'])->middleware('permission:planning.manage')->name('admin.reservations.cancel');
 
     });
 
             Route::middleware('role:super_admin')->group(function () {
-                Route::get('admin/manager-account-requests', [AdminManagerAccountRequestController::class, 'index'])->name('admin.manager-requests.index');
-                Route::patch('admin/manager-account-requests/{managerRequest}/approve', [AdminManagerAccountRequestController::class, 'approve'])->name('admin.manager-requests.approve');
-                Route::patch('admin/manager-account-requests/{managerRequest}/reject', [AdminManagerAccountRequestController::class, 'reject'])->name('admin.manager-requests.reject');
+                Route::get('admin/manager-account-requests', [AdminManagerAccountRequestController::class, 'index'])->middleware('permission:manager-requests.review')->name('admin.manager-requests.index');
+                Route::patch('admin/manager-account-requests/{managerRequest}/approve', [AdminManagerAccountRequestController::class, 'approve'])->middleware('permission:manager-requests.review')->name('admin.manager-requests.approve');
+                Route::patch('admin/manager-account-requests/{managerRequest}/reject', [AdminManagerAccountRequestController::class, 'reject'])->middleware('permission:manager-requests.review')->name('admin.manager-requests.reject');
             });
 
 });

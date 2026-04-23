@@ -18,42 +18,51 @@
             </h3>
 
             <div class="space-y-1">
-                <a href="{{  route('admin.dashboard.index') }}"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors bg-green-50 text-green-700">
-                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.5h8.25V3H3v10.5zm9.75 7.5H21V3h-8.25v18zm-9.75 0h8.25v-4.5H3V21z"/>
-                    </svg>
-                    <span>Dashboard</span>
-                </a>
+                @canany(['manager.dashboard.view', 'finance.dashboard.view', 'guard.mobile.access'])
+                    <a href="{{  route('admin.dashboard.index') }}"
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors bg-green-50 text-green-700">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.5h8.25V3H3v10.5zm9.75 7.5H21V3h-8.25v18zm-9.75 0h8.25v-4.5H3V21z"/>
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+                @endcanany
             </div>
         </div>
 
-        <div class="space-y-2">
-            <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                Management
-            </h3>
-                <a href="{{ route('admin.fields.index') }}"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900">
-                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6-3 6 3v12l-6 3-6-3-6 3V6l6-3 6 3"/>
-                    </svg>
-                    <span>Fields</span>
-                </a>
-                <a href="{{ route('admin.users.index') }}"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900">
-                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6-3 6 3v12l-6 3-6-3-6 3V6l6-3 6 3"/>
-                    </svg>
-                    <span>Users</span>
-                </a>
-                <a href="{{ route('admin.reservations.index') }}"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900">
-                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6-3 6 3v12l-6 3-6-3-6 3V6l6-3 6 3"/>
-                    </svg>
-                    <span>Reservations</span>
-                </a>
-                @if(auth()->user()?->hasRole('super_admin'))
+        @canany(['fields.manage', 'staff.manage', 'users.blacklist.manage', 'planning.daily.view', 'manager-requests.review'])
+            <div class="space-y-2">
+                <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                    Management
+                </h3>
+                @can('fields.manage')
+                    <a href="{{ route('admin.fields.index') }}"
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6-3 6 3v12l-6 3-6-3-6 3V6l6-3 6 3"/>
+                        </svg>
+                        <span>Fields</span>
+                    </a>
+                @endcan
+                @canany(['staff.manage', 'users.blacklist.manage'])
+                    <a href="{{ route('admin.users.index') }}"
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6-3 6 3v12l-6 3-6-3-6 3V6l6-3 6 3"/>
+                        </svg>
+                        <span>Users</span>
+                    </a>
+                @endcanany
+                @can('planning.daily.view')
+                    <a href="{{ route('admin.reservations.index') }}"
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6-3 6 3v12l-6 3-6-3-6 3V6l6-3 6 3"/>
+                        </svg>
+                        <span>Reservations</span>
+                    </a>
+                @endcan
+                @can('manager-requests.review')
                     <a href="{{ route('admin.manager-requests.index') }}"
                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
@@ -61,9 +70,9 @@
                         </svg>
                         <span>Manager Requests</span>
                     </a>
-                @endif
+                @endcan
             </div>
-        </div>
+        @endcanany
     </div>
 
     <div class="p-4 border-t border-gray-100">

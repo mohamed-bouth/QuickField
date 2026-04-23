@@ -2,13 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
-class RoleSeeder extends Seeder
+class PermissionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -17,33 +15,30 @@ class RoleSeeder extends Seeder
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        $superAdmin = Role::firstOrCreate(['name' => 'super_admin']);
-        $fieldManager = Role::firstOrCreate(['name' => 'field_manager']);
-        $fieldGuard = Role::firstOrCreate(['name' => 'field_guard']);
-        $player = Role::firstOrCreate(['name' => 'player']);
+        $permissions = [
+            // Super admin
+            'kyc.review',
+            'users.blacklist.manage',
+            'finance.dashboard.view',
+            'disputes.manage',
+            'settings.manage',
+            'manager-requests.review',
 
-        $allPermissions = Permission::pluck('name')->toArray();
-
-        $superAdmin->syncPermissions($allPermissions);
-
-        $fieldManager->syncPermissions([
+            // Manager
             'fields.manage',
             'planning.manage',
             'pricing.manage',
             'staff.manage',
             'manager.dashboard.view',
             'field.availability.manage',
-            'planning.daily.view',
-        ]);
 
-        $fieldGuard->syncPermissions([
+            // Field guard
             'guard.mobile.access',
             'tickets.scan',
             'payments.remaining.collect',
             'planning.daily.view',
-        ]);
 
-        $player->syncPermissions([
+            // Player
             'fields.browse',
             'reservations.create',
             'reservations.cancel',
@@ -52,6 +47,10 @@ class RoleSeeder extends Seeder
             'reviews.create',
             'profile.manage',
             'favorites.manage',
-        ]);
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
     }
 }
