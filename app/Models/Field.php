@@ -36,4 +36,9 @@ class Field extends Model
         return $this->hasMany(FieldWorkHour::class);
     }
 
+    public function guards()
+{
+    return $this->belongsToMany(User::class, 'field_guard');
+}
+
 }

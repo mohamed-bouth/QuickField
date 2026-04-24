@@ -33,7 +33,9 @@
                         @forelse ($reservations as $reservation)
                             <tr>
                                 <td class="whitespace-nowrap px-6 py-4 font-semibold text-gray-900">
+                                    <a href="{{ route('reservations.show' , $reservation->id)}}">
                                     {{ $reservation->field->name ?? 'Field unavailable' }}
+                                    </a>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
                                     {{ optional($reservation->start_time)->format('Y-m-d H:i') }}

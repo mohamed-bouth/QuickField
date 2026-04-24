@@ -126,4 +126,18 @@ class ReservationController extends Controller
 
         return view('public.fields.payment' , compact('field', 'user' , 'reservation'));
     }
+
+    public function show($id)
+    {
+        $reservation = Reservation::with([
+            'field',
+            'user',
+            'payment',
+            'payment.ticket'
+        ])->where('id', $id)
+        ->where('user_id', auth()->id())
+        ->firstOrFail();
+
+        return view('public.reservations.show', compact('reservation'));
+    }
 }

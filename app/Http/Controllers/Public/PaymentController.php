@@ -6,11 +6,13 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Reservation;
+use App\Models\Ticket;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
 use Stripe\Exception\ApiErrorException;
+use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
@@ -132,7 +134,7 @@ class PaymentController extends Controller
                 ]);
             }
 
-            Payment::updateOrCreate(
+            $payment = Payment::updateOrCreate(
                 ['reservation_id' => $reservation->id],
                 [
                     'total_amount' => round((float) $price, 2),
@@ -140,6 +142,16 @@ class PaymentController extends Controller
                     'status' => 'pending',
                 ]
             );
+            
+            $token = Str::uuid();
+
+            Ticket::create([
+                'payment_id' => $payment->id,
+                'qr_code_hash' => $token,
+                'scan_status' => 'pending'
+            ]);
+
+
         });
 
         return response()->json([

@@ -14,16 +14,20 @@ class ReservationController extends Controller
         $selectedStatus = $request->input('status');
 
         $reservations = Reservation::with(['user', 'field'])
-            ->when(! $user->hasRole('super_admin'), function ($query) use ($user) {
-                $query->whereHas('field', function ($fieldQuery) use ($user) {
-                    $fieldQuery->where('user_id', $user->id);
+            ->when($user->hasRole('super_admin'), function ($query) {
+                // no restriction
+            })
+
+            ->when($user->hasRole('field_manager'), function ($query) use ($user) {
+                $query->whereHas('field', function ($q) use ($user) {
+                    $q->where('user_id', $user->id);
                 });
             })
-            ->when($request->filled('date'), function ($query) use ($request) {
-                $query->whereDate('start_time', $request->date);
-            })
-            ->when(in_array($selectedStatus, $allowedStatuses, true), function ($query) use ($selectedStatus) {
-                $query->where('status', $selectedStatus);
+
+            ->when($user->hasRole('field_guard'), function ($query) use ($user) {
+                $query->whereHas('field.guards', function ($q) use ($user) {
+                    $q->where('users.id', $user->id);
+                });
             })
             ->latest()
             ->paginate(12)

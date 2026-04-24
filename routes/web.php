@@ -58,6 +58,8 @@ Route::middleware('auth')->group(function () {
                 ->route('public.fields.show', $reservation->field_id)
                 ->with('success', 'Payment completed successfully.');
         })->middleware('permission:payments.deposit.pay')->name('public.payment.success');
+
+        Route::get('/reservations/{id}', [ReservationController::class, 'show'])->name('reservations.show');
     }); 
 
     Route::middleware('role:super_admin|field_manager|field_guard')->group(function () {

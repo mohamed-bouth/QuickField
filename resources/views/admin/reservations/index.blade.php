@@ -81,7 +81,7 @@
                     <tbody class="divide-y divide-gray-100">
                         @forelse($reservations as $reservation)
                             <tr>
-                                <td class="px-3 py-3 font-medium text-gray-900">#{{ $reservation->id }}</td>
+                                <td class="px-3 py-3 font-medium text-gray-900">{{ $reservation->id }}</td>
                                 <td class="px-3 py-3 text-gray-700">{{ $reservation->user->name ?? 'Unknown' }}</td>
                                 <td class="px-3 py-3 text-gray-700">{{ $reservation->field->name ?? 'Unknown' }}</td>
                                 <td class="px-3 py-3 text-gray-700">{{ $reservation->start_time }}</td>
@@ -92,6 +92,7 @@
                                     </span>
                                 </td>
                                 <td class="px-3 py-3">
+                                    @hasanyrole('field_manager|super_admin')
                                     @if($reservation->status === 'payed')
                                         <div class="flex items-center gap-2">
                                             <form action="{{ route('admin.reservations.confirm', $reservation) }}" method="POST">
@@ -113,6 +114,10 @@
                                     @else
                                         <span class="text-xs text-gray-400">No action</span>
                                     @endif
+                                    @endhasanyrole
+                                    @role('field_guard')
+                                        <span class="text-xs text-gray-400">No action</span>
+                                    @endrole
                                 </td>
                             </tr>
                         @empty
