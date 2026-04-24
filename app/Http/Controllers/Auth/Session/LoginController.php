@@ -20,6 +20,13 @@ class LoginController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
+            if (Auth::user()?->status === 'inactive') {
+                Auth::logout();
+
+                return back()->withErrors([
+                    'email' => 'Your account is inactive. Please contact support.',
+                ])->onlyInput('email');
+            }
             
             $request->session()->regenerate();
 

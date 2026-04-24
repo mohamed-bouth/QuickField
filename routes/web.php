@@ -62,15 +62,16 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('role:super_admin|field_manager|field_guard')->group(function () {
             Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])
-                ->middleware('permission:finance.dashboard.view')
+                ->middleware('permission:finance.dashboard.view|manager.dashboard.view|guard.mobile.access')
                 ->name('admin.dashboard.index');
 
             Route::get('admin/fields', [AdminFieldController::class, 'index'])->middleware('permission:fields.manage')->name('admin.fields.index');
-            Route::get('admin/fields/create', [AdminFieldController::class, 'create'])->middleware('permission:fields.manage')->name('admin.fields.create');
-            Route::post('admin/fields', [AdminFieldController::class, 'store'])->middleware('permission:fields.manage')->name('admin.fields.store');
+            Route::get('admin/fields/create', [AdminFieldController::class, 'create'])->middleware(['permission:fields.manage', 'role:field_manager'])->name('admin.fields.create');
+            Route::post('admin/fields', [AdminFieldController::class, 'store'])->middleware(['permission:fields.manage', 'role:field_manager'])->name('admin.fields.store');
             Route::get('admin/fields/{field}', [AdminFieldController::class, 'show'])->middleware('permission:fields.manage')->name('admin.fields.show');
             Route::get('admin/fields/{id}/edit', [AdminFieldController::class, 'edit'])->middleware('permission:fields.manage')->name('admin.fields.edit');
             Route::put('admin/fields/{id}', [AdminFieldController::class, 'update'])->middleware('permission:fields.manage')->name('admin.fields.update');
+            Route::patch('admin/fields/{field}/validation', [AdminFieldController::class, 'updateValidation'])->middleware(['permission:fields.manage', 'role:super_admin'])->name('admin.fields.validation.update');
             Route::delete('admin/fields/{id}', [AdminFieldController::class, 'destroy'])->middleware('permission:fields.manage')->name('admin.fields.destroy');
             Route::put('admin/fields/{field}/planning', [AdminFieldController::class, 'updatePlanning'])->middleware('permission:planning.manage')->name('admin.fields.planning.update');
 

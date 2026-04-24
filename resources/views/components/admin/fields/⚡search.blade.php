@@ -3,6 +3,7 @@
 use Livewire\Component;
 use Livewire\Attributes\Computed;
 use App\Models\Field;
+use Illuminate\Support\Facades\Auth;
 
 new class extends Component {
     public string $search = '';
@@ -10,7 +11,16 @@ new class extends Component {
     #[Computed]
     public function fields()
     {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+
         return Field::query()
+            ->when(
+                $user && $user->hasRole('field_manager') && ! $user->hasRole('super_admin'),
+                function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                }
+            )
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%');
             })
@@ -79,21 +89,21 @@ new class extends Component {
                         </td>
 
                         <td class="px-6 py-4">
-                            @if ($field->status === 'active')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100 gap-1">
-                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                        <circle cx="12" cy="12" r="10"/>
-                                    </svg>
-                                    <span>Active</span>
-                                </span>
-                            @else
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-100 gap-1">
-                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                        <circle cx="12" cy="12" r="10"/>
-                                    </svg>
-                                    <span>Inactive</span>
-                                </span>
-                            @endif
+                            @php
+                                $statusConfig = match ($field->status) {
+                                    'active' => ['bg' => 'bg-green-50 text-green-700 border-green-100', 'label' => 'Active'],
+                                    'pending' => ['bg' => 'bg-amber-50 text-amber-700 border-amber-100', 'label' => 'Pending Validation'],
+                                    'rejected' => ['bg' => 'bg-rose-50 text-rose-700 border-rose-100', 'label' => 'Rejected'],
+                                    default => ['bg' => 'bg-gray-100 text-gray-700 border-gray-200', 'label' => 'Inactive'],
+                                };
+                            @endphp
+
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border gap-1 {{ $statusConfig['bg'] }}">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10"/>
+                                </svg>
+                                <span>{{ $statusConfig['label'] }}</span>
+                            </span>
                         </td>
 
                         <td class="px-6 py-4">

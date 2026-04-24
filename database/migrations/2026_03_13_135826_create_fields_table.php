@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('image_path');
             $table->string('localisation');
             $table->enum('type' , ['5v5' , '7v7']);
-            $table->enum('status' , ['active' , 'inactive']);
+            $table->enum('status' , ['active' , 'inactive' , 'pending'])->default('pending');
             $table->timestamps();
         });
     }

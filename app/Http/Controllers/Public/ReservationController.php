@@ -14,9 +14,11 @@ class ReservationController extends Controller
     {
         Reservation::expirePendingReservations();
 
-        $reservations = Reservation::with(['field', 'payment'])
-            ->where('user_id', $request->user()->id)
-            ->latest('start_time')
+        $user = $request->user();
+
+        $reservations = $user->reservations()
+            ->with(['field', 'payment'])
+            ->latest('created_at')
             ->paginate(12);
 
         return view('public.reservations.history', compact('reservations'));

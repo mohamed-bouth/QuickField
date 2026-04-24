@@ -61,4 +61,9 @@ class User extends Authenticatable
     public function reviews(){
         return $this->hasMany(Review::class);
     }
+
+    public function guardedFields()
+    {
+        return $this->belongsToMany(Field::class, 'field_guard', 'user_id', 'field_id');
+    }
 }
