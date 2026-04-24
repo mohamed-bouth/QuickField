@@ -68,16 +68,20 @@
                 </select>
             </div>
 
-            <div class="space-y-2">
-                <label class="text-sm font-medium text-gray-700">Status</label>
-                <select
-                    name="status"
-                    class="w-full rounded-xl border border-gray-300 focus:border-green-600 focus:ring-green-600 h-12 px-3 text-sm text-gray-700 bg-white outline-none"
-                >
-                    <option value="active" {{ old('status', $field->status) === 'active' ? 'selected' : '' }}>Active (Bookable)</option>
-                    <option value="inactive" {{ old('status', $field->status) === 'inactive' ? 'selected' : '' }}>Inactive (Maintenance/Closed)</option>
-                </select>
-            </div>
+            @if(auth()->user()?->hasRole('super_admin'))
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-700">Status</label>
+                    <select
+                        name="status"
+                        class="w-full rounded-xl border border-gray-300 focus:border-green-600 focus:ring-green-600 h-12 px-3 text-sm text-gray-700 bg-white outline-none"
+                    >
+                        <option value="pending" {{ old('status', $field->status) === 'pending' ? 'selected' : '' }}>Pending Validation</option>
+                        <option value="active" {{ old('status', $field->status) === 'active' ? 'selected' : '' }}>Active (Bookable)</option>
+                        <option value="inactive" {{ old('status', $field->status) === 'inactive' ? 'selected' : '' }}>Inactive (Maintenance/Closed)</option>
+                        <option value="rejected" {{ old('status', $field->status) === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                    </select>
+                </div>
+            @endif
         </div>
     </div>
 

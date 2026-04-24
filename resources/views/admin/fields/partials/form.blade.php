@@ -68,14 +68,10 @@
             </div>
 
             <div class="space-y-2">
-                <label class="text-sm font-medium text-gray-700">Status</label>
-                <select
-                    name="status"
-                    class="w-full rounded-xl border border-gray-300 focus:border-green-600 focus:ring-green-600 h-12 px-3 text-sm text-gray-700 bg-white outline-none"
-                >
-                    <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>Active (Bookable)</option>
-                    <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive (Maintenance/Closed)</option>
-                </select>
+                <label class="text-sm font-medium text-gray-700">Initial Status</label>
+                <div class="w-full rounded-xl border border-amber-200 bg-amber-50 h-12 px-3 text-sm text-amber-800 inline-flex items-center">
+                    Pending confirmation by Super Admin
+                </div>
             </div>
         </div>
     </div>

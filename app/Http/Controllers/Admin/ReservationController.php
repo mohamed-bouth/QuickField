@@ -9,10 +9,16 @@ use Illuminate\Http\Request;
 class ReservationController extends Controller
 {
     public function index(Request $request){
+        $user = $request->user();
         $allowedStatuses = ['pending', 'payed', 'confirmed', 'cancelled'];
         $selectedStatus = $request->input('status');
 
         $reservations = Reservation::with(['user', 'field'])
+            ->when(! $user->hasRole('super_admin'), function ($query) use ($user) {
+                $query->whereHas('field', function ($fieldQuery) use ($user) {
+                    $fieldQuery->where('user_id', $user->id);
+                });
+            })
             ->when($request->filled('date'), function ($query) use ($request) {
                 $query->whereDate('start_time', $request->date);
             })
@@ -26,8 +32,10 @@ class ReservationController extends Controller
         return view('admin.reservations.index', compact('reservations', 'allowedStatuses', 'selectedStatus'));
     }
 
-    public function confirm(Reservation $reservation)
+    public function confirm(Request $request, Reservation $reservation)
     {
+        abort_unless($this->canAccessReservation($request, $reservation), 403);
+
         if ($reservation->status !== 'payed') {
             return back()->with('error', 'Only payed reservations can be confirmed.');
         }
@@ -39,8 +47,10 @@ class ReservationController extends Controller
         return back()->with('success', 'Reservation confirmed successfully.');
     }
 
-    public function cancel(Reservation $reservation)
+    public function cancel(Request $request, Reservation $reservation)
     {
+        abort_unless($this->canAccessReservation($request, $reservation), 403);
+
         if ($reservation->status !== 'payed') {
             return back()->with('error', 'Only payed reservations can be cancelled.');
         }
@@ -50,5 +60,14 @@ class ReservationController extends Controller
         ]);
 
         return back()->with('success', 'Reservation cancelled successfully.');
+    }
+
+    private function canAccessReservation(Request $request, Reservation $reservation): bool
+    {
+        if ($request->user()->hasRole('super_admin')) {
+            return true;
+        }
+
+        return (int) $reservation->field()->value('user_id') === (int) $request->user()->id;
     }
 }

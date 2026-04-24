@@ -22,12 +22,13 @@ class FieldController extends Controller
 
     public function store(Request $request)
     {
+        abort_unless($request->user()->hasRole('field_manager'), 403);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'localisation' => 'required|string|max:255',
             'description' => 'required|string',
             'type' => 'required|in:5v5,7v7',
-            'status' => 'required|in:active,inactive',
             'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
@@ -39,7 +40,7 @@ class FieldController extends Controller
             'localisation' => $validated['localisation'],
             'description' => $validated['description'],
             'type' => $validated['type'],
-            'status' => $validated['status'],
+            'status' => 'pending',
             'image_path' => $imagePath,
         ]);
 
@@ -69,19 +70,22 @@ class FieldController extends Controller
 
         return redirect()
             ->route('admin.fields.index')
-            ->with('success', 'Field created successfully.');
+            ->with('success', 'Field created and sent for super admin validation.');
     }
 
-    public function show(Field $field)
+    public function show(Request $request, Field $field)
     {
+        abort_unless($this->canAccessField($request, $field), 403);
+
         $field->load('fieldWorkHours');
 
         return view('admin.fields.show', compact('field'));
     }
 
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $field = Field::findOrFail($id);
+        abort_unless($this->canAccessField($request, $field), 403);
 
         return view('admin.fields.edit', compact('field'));
     }
@@ -89,15 +93,23 @@ class FieldController extends Controller
     public function update(Request $request, $id)
     {
         $field = Field::findOrFail($id);
+        abort_unless($this->canAccessField($request, $field), 403);
 
-        $validated = $request->validate([
+        $isSuperAdmin = $request->user()->hasRole('super_admin');
+
+        $rules = [
             'name' => 'required|string|max:255',
             'localisation' => 'required|string|max:255',
             'description' => 'required|string',
             'type' => 'required|in:5v5,7v7',
-            'status' => 'required|in:active,inactive',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
-        ]);
+        ];
+
+        if ($isSuperAdmin) {
+            $rules['status'] = 'required|in:pending,active,inactive,rejected';
+        }
+
+        $validated = $request->validate($rules);
 
         $imagePath = $field->image_path;
         $imageUrl = $field->image_url;
@@ -110,23 +122,46 @@ class FieldController extends Controller
             $imagePath = Storage::disk('r2')->putFile('fields', $request->file('image'), 'public');
         }
 
-        $field->update([
+        $updateData = [
             'name' => $validated['name'],
             'localisation' => $validated['localisation'],
             'description' => $validated['description'],
             'type' => $validated['type'],
-            'status' => $validated['status'],
             'image_path' => $imagePath,
-        ]);
+        ];
+
+        if ($isSuperAdmin) {
+            $updateData['status'] = $validated['status'];
+        }
+
+        $field->update($updateData);
 
         return redirect()
             ->route('admin.fields.index')
             ->with('success', 'Field updated successfully.');
     }
 
-    public function destroy($id)
+    public function updateValidation(Request $request, Field $field)
+    {
+        abort_unless($request->user()->hasRole('super_admin'), 403);
+
+        $validated = $request->validate([
+            'status' => 'required|in:active,rejected',
+        ]);
+
+        $field->update([
+            'status' => $validated['status'],
+        ]);
+
+        return redirect()
+            ->route('admin.fields.index')
+            ->with('success', 'Field validation updated successfully.');
+    }
+
+    public function destroy(Request $request, $id)
     {
         $field = Field::findOrFail($id);
+        abort_unless($this->canAccessField($request, $field), 403);
 
         if ($field->image_path) {
             Storage::disk('r2')->delete($field->image_path);
@@ -141,6 +176,8 @@ class FieldController extends Controller
 
     public function updatePlanning(Request $request, Field $field)
     {   
+        abort_unless($this->canAccessField($request, $field), 403);
+
         
         $validated = $request->validate([
             'work_hours' => ['required', 'array'],
@@ -171,5 +208,14 @@ class FieldController extends Controller
         }
 
         return back()->with('success', 'Planning updated successfully.');
+    }
+
+    private function canAccessField(Request $request, Field $field): bool
+    {
+        if ($request->user()->hasRole('super_admin')) {
+            return true;
+        }
+
+        return (int) $field->user_id === (int) $request->user()->id;
     }
 }
