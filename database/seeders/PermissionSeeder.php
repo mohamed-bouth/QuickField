@@ -37,6 +37,7 @@ class PermissionSeeder extends Seeder
             'tickets.scan',
             'payments.remaining.collect',
             'planning.daily.view',
+            'scan-qr-code',
 
             // Player
             'fields.browse',

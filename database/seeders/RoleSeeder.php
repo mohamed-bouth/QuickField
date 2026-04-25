@@ -41,6 +41,7 @@ class RoleSeeder extends Seeder
             'tickets.scan',
             'payments.remaining.collect',
             'planning.daily.view',
+            'scan-qr-code',
         ]);
 
         $player->syncPermissions([

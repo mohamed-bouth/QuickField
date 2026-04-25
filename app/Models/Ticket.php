@@ -12,7 +12,8 @@ class Ticket extends Model
         'scan_status'
     ];
 
-    public function payment(){
-        return $this->hasOne(Payment::class);
+    public function payment()
+    {
+        return $this->belongsTo(Payment::class, 'payment_id');
     }
 }
