@@ -15,6 +15,7 @@ use App\Http\Controllers\Public\ReviewController;
 use App\Http\Controllers\Public\PaymentController;
 use App\Http\Controllers\Public\ManagerAccountRequestController as PublicManagerAccountRequestController;
 use App\Http\Controllers\Admin\ManagerAccountRequestController as AdminManagerAccountRequestController;
+use App\Http\Controllers\Admin\QRScanController as AdminQRScanController;
 
 Route::middleware('guest')->group(function () {
 
@@ -84,6 +85,11 @@ Route::middleware('auth')->group(function () {
             Route::get("admin/reservations/", [AdminReservationController::class, 'index'])->middleware('permission:planning.daily.view')->name('admin.reservations.index');
             Route::patch('admin/reservations/{reservation}/confirm', [AdminReservationController::class, 'confirm'])->middleware('permission:planning.manage')->name('admin.reservations.confirm');
             Route::patch('admin/reservations/{reservation}/cancel', [AdminReservationController::class, 'cancel'])->middleware('permission:planning.manage')->name('admin.reservations.cancel');
+
+            Route::get('admin/scan-ticket', [AdminQRScanController::class, 'index'])->middleware('permission:scan-qr-code')->name('admin.scan-ticket.index');
+            Route::post('admin/scan-ticket/verify', [AdminQRScanController::class, 'verify'])->middleware('permission:scan-qr-code')->name('admin.scan-ticket.verify');
+            Route::get('admin/scan-ticket/{hash}/details', [AdminQRScanController::class, 'showDetails'])->middleware('permission:scan-qr-code')->name('admin.scan-ticket.details');
+            Route::post('admin/scan-ticket/{hash}/confirm', [AdminQRScanController::class, 'confirm'])->middleware('permission:scan-qr-code')->name('admin.scan-ticket.confirm');
 
     });
 

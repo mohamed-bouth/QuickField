@@ -18,6 +18,7 @@
             <span>Add User</span>
         </a>
     </div>
-
-    <livewire:admin.users.search />
+    @can('users.blacklist.manage')
+        <livewire:admin.users.search />
+    @endcan
 @endsection
