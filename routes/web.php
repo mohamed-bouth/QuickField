@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('field/details/{field}/reviews/{review}', [ReviewController::class, 'destroy'])->middleware('permission:reviews.create')->name('public.fields.reviews.destroy');
         Route::get('fields/{field}/reservations/events', [FieldController::class, 'events'])->middleware('permission:fields.browse');
         Route::get('manager/fields/{id}/blocks/create', [ReservationController::class, 'takeHour'])->middleware('permission:reservations.create')->name('public.fields.blocks.create');
+        Route::get('/api/search-fields', [FieldController::class, 'liveSearch'])->name('api.fields.search');
         Route::get('my-reservations', [ReservationController::class, 'history'])->middleware('permission:tickets.view')->name('public.reservations.history');
         Route::get('reservation/{reservation}/continue', [ReservationController::class, 'continuePayment'])->middleware('permission:reservations.create')->name('public.reservations.continue-payment');
         Route::patch('reservation/{reservation}/cancel', [ReservationController::class, 'cancel'])->middleware('permission:reservations.cancel')->name('public.reservations.cancel');
@@ -80,6 +81,9 @@ Route::middleware('auth')->group(function () {
 
             Route::get('admin/users', [AdminUserController::class, 'index'])->middleware('role_or_permission:super_admin|staff.manage|users.blacklist.manage')->name('admin.users.index');
             Route::get('admin/users/create', [AdminUserController::class, 'create'])->middleware('permission:staff.manage')->name('admin.users.create');
+            Route::post('admin/users/store', [AdminUserController::class, 'store'])->middleware('permission:staff.manage')->name('admin.users.store');
+            Route::get('admin/users/{id}/edit', [AdminUserController::class, 'edit'])->middleware('role_or_permission:super_admin|staff.manage|users.blacklist.manage')->name('admin.users.edit');
+            Route::put('admin/users/{id}', [AdminUserController::class, 'update'])->middleware('role_or_permission:super_admin|staff.manage|users.blacklist.manage')->name('admin.users.update');
             Route::delete("admin/users/destroy/{id}", [AdminUserController::class, 'destroy'])->middleware('role_or_permission:super_admin|staff.manage|users.blacklist.manage')->name('admin.users.destroy');
 
             Route::get("admin/reservations/", [AdminReservationController::class, 'index'])->middleware('permission:planning.daily.view')->name('admin.reservations.index');

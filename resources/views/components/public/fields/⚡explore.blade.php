@@ -168,11 +168,77 @@ new class extends Component {
                     </div>
                 </div>
 
-                <!-- <div class="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+                <div class="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
                     <div class="mb-4 flex items-center justify-between">
                         <h3 class="font-bold text-gray-900">Max Price</h3>
                         <span class="text-sm font-semibold text-green-700">{{ $maxPrice }} MAD</span>
-                    </div>
+                    </div><script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        let searchTimeout = null;
+
+        if (searchInput && searchResults) {
+            searchInput.addEventListener('input', function() {
+                // Nmes7o timeout l-9dim
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+
+                // Ila kant l-ktaba 9el mn 2 hrouf, nkhbiw l-menu
+                if (query.length < 2) {
+                    searchResults.classList.add('hidden');
+                    return;
+                }
+
+                // Ntsnaw 300ms 3ad nsifto t-talab
+                searchTimeout = setTimeout(() => {
+                    
+                    // Nsifto t-talab l-Route li sawbna f Laravel
+                    fetch(`/api/search-fields?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // Nkhwiw l-menu l-9dim
+                            searchResults.innerHTML = '';
+
+                            if (data.length > 0) {
+                                // Ila l9ina l-mala3ib, nsawbohom f HTML
+                                data.forEach(field => {
+                                    // Bdel /fields/${field.id} b lien s7i7 dyal l-page dyal l-ml3ab
+                                    searchResults.innerHTML += `
+                                        <a href="/fields/${field.id}" class="block px-5 py-3 hover:bg-slate-50 border-b border-slate-50 last:border-0 transition-colors">
+                                            <div class="font-bold text-slate-700">${field.name}</div>
+                                            <div class="text-sm text-slate-400 mt-0.5">
+                                                <svg class="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                                ${field.location || 'Location not specified'}
+                                            </div>
+                                        </a>
+                                    `;
+                                });
+                            } else {
+                                // Ila mal9ina walo
+                                searchResults.innerHTML = `
+                                    <div class="px-5 py-4 text-slate-500 text-sm text-center">
+                                        No fields found for "<span class="font-semibold">${query}</span>"
+                                    </div>
+                                `;
+                            }
+                            
+                            // Nbiyno l-menu
+                            searchResults.classList.remove('hidden');
+                        })
+                        .catch(error => console.error('Error fetching fields:', error));
+                }, 300);
+            });
+
+            // Mli nwerko f ay blassa khra f l-page, nseddo l-menu d n-nata2ij
+            document.addEventListener('click', function(event) {
+                if (!searchInput.contains(event.target) && !searchResults.contains(event.target)) {
+                    searchResults.classList.add('hidden');
+                }
+            });
+        }
+    });
+</script>
 
                     <input
                         type="range"
@@ -187,7 +253,7 @@ new class extends Component {
                         <span>0</span>
                         <span>500+</span>
                     </div>
-                </div> -->
+                </div>
             </aside>
 
             <section class="flex-1">

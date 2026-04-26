@@ -11,14 +11,32 @@ new class extends Component {
     #[Computed]
     public function users()
     {
-        return User::query()
-            ->when($this->search, function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('email', 'like', '%' . $this->search . '%');
+    $auth = Auth::user();
+
+    return User::query()
+
+        ->when($this->search, function ($query) {
+            $query->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('email', 'like', '%' . $this->search . '%');
+            });
+        })
+
+        ->when(!$auth->hasRole('super_admin'), function ($query) use ($auth) {
+
+            $query->whereHas('roles', function ($q) {
+                $q->where('name', 'field_guard');
             })
-            ->with('roles')
-            ->latest()
-            ->get();
+
+            ->whereHas('guardedFields', function ($q) use ($auth) {
+                $q->where('fields.user_id', $auth->id);
+            });
+
+        })
+
+        ->with('roles')
+        ->latest()
+        ->get();
     }
 
     #[Computed]
@@ -138,12 +156,19 @@ new class extends Component {
                                 <select
                                     class="h-9 rounded-lg border border-gray-200 bg-white text-xs text-gray-700 px-2"
                                     wire:change="updateRole({{ $user->id }}, $event.target.value)"
-                                >
+                                >   
+                                    @role('super_admin')
                                     @foreach ($this->roles as $role)
                                         <option value="{{ $role->name }}" @selected($user->roles->first()?->name === $role->name)>
                                             {{ $role->name }}
                                         </option>
                                     @endforeach
+                                    @endrole
+                                    @role('field_manager')
+                                        <option value="field_guard" @selected($user->roles->first()?->name === 'field_guard')>
+                                            field_guard
+                                        </option>
+                                    @endrole
                                 </select>
                             </div>
                         </td>
@@ -154,6 +179,13 @@ new class extends Component {
 
                         <td class="px-6 py-4 text-right">
                             <div class="inline-flex items-center gap-2">
+                                <a href="{{ route('admin.users.edit', $user->id) }}"
+                                   class="px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors inline-flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                    <span>Edit User</span>
+                                </a>
                                 <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Delete this user?')">
                                     @csrf
                                     @method('DELETE')
