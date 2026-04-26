@@ -27,33 +27,25 @@
 
       <!-- Search Box -->
       <div class="mt-12 max-w-4xl mx-auto rounded-[28px] bg-white shadow-[0_10px_30px_rgba(15,23,42,0.08)] border border-slate-100 p-4">
-        <div class="grid grid-cols-1 md:grid-cols-[1.3fr_0.7fr_auto] gap-3">
-
-          <div class="h-16 rounded-2xl bg-slate-50 px-5 flex items-center gap-3 text-slate-500">
-            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-4.35-7-10a7 7 0 1114 0c0 5.65-7 10-7 10z" />
-              <circle cx="12" cy="11" r="2.5" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Where do you want to play?"
-              class="w-full bg-transparent outline-none placeholder:text-slate-400 text-slate-700" />
-          </div>
-
-          <div class="h-16 rounded-2xl bg-slate-50 px-5 flex items-center gap-3 text-slate-500">
-            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z" />
-            </svg>
-            <input
-              type="date"
-              class="w-full bg-transparent outline-none text-slate-700" />
-          </div>
-
-          <button class="h-16 px-8 rounded-2xl bg-green-600 hover:bg-green-700 text-white text-lg font-semibold shadow-sm transition">
-            Search Fields
-          </button>
+        <div class="relative w-full">
+            <div class="h-16 rounded-2xl bg-slate-50 px-5 flex items-center gap-3 text-slate-500">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-7-4.35-7-10a7 7 0 1114 0c0 5.65-7 10-7 10z" />
+                    <circle cx="12" cy="11" r="2.5" />
+                </svg>
+                <input
+                    id="searchInput"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="Where do you want to play?"
+                    class="w-full bg-transparent outline-none placeholder:text-slate-400 text-slate-700" 
+                />
+            </div>
+            
+            <div id="searchResults" class="hidden absolute top-full left-0 w-full mt-2 bg-white rounded-2xl shadow-xl border border-slate-100 max-h-60 overflow-y-auto z-50">
+                </div>
         </div>
-      </div>
+    </div>
 
       <!-- Features -->
       <div class="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-slate-500">
@@ -94,7 +86,7 @@
         </p>
       </div>
 
-      <a href="#" class="hidden md:inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition">
+      <a href="{{ route('public.fields.index') }}" class="hidden md:inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition">
         <span>View All</span>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6-6 6" />
@@ -170,4 +162,61 @@
     </div>
   </div>
 </section>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        let searchTimeout = null;
+
+        if (searchInput && searchResults) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+
+                if (query.length < 2) {
+                    searchResults.classList.add('hidden');
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    
+                    fetch(`/api/search-fields?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            searchResults.innerHTML = '';
+
+                            if (data.length > 0) {
+                                data.forEach(field => {
+                                    searchResults.innerHTML += `
+                                        <a href="/field/details/${field.id}" class="block px-5 py-3 hover:bg-slate-50 border-b border-slate-50 last:border-0 transition-colors">
+                                            <div class="font-bold text-slate-700">${field.name}</div>
+                                            <div class="text-sm text-slate-400 mt-0.5">
+                                                <svg class="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                                ${field.location || 'Location not specified'}
+                                            </div>
+                                        </a>
+                                    `;
+                                });
+                            } else {
+                                searchResults.innerHTML = `
+                                    <div class="px-5 py-4 text-slate-500 text-sm text-center">
+                                        No fields found for "<span class="font-semibold">${query}</span>"
+                                    </div>
+                                `;
+                            }
+                            
+                            searchResults.classList.remove('hidden');
+                        })
+                        .catch(error => console.error('Error fetching fields:', error));
+                }, 300);
+            });
+
+            document.addEventListener('click', function(event) {
+                if (!searchInput.contains(event.target) && !searchResults.contains(event.target)) {
+                    searchResults.classList.add('hidden');
+                }
+            });
+        }
+    });
+</script>
 @endsection

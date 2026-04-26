@@ -18,7 +18,7 @@
             <span>Add User</span>
         </a>
     </div>
-    @can('users.blacklist.manage')
+    @canany(['users.blacklist.manage', 'staff.manage'])
         <livewire:admin.users.search />
-    @endcan
+    @endcanany
 @endsection

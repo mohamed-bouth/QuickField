@@ -12,8 +12,8 @@
 
     <nav class="flex items-center justify-between px-8 py-4 border-b border-gray-100">
         <div class="flex items-center gap-2">
-            <div class="flex items-center justify-center w-8 h-8 bg-green-500 rounded-full text-white font-bold">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                <img class=rounded src="https://pub-bd8291a7790f4b588b9daf7b1db26e25.r2.dev/app-image/ChatGPT%20Image%20Apr%2026%2C%202026%2C%2002_47_10%20PM.png" alt="">
             </div>
             <span class="text-xl font-semibold text-gray-800">QuickField</span>
         </div>

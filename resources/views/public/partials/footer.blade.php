@@ -5,9 +5,9 @@
         <div class="md:col-span-1 space-y-4">
           <div class="flex items-center gap-2">
             <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-              </svg>
+              <div class="w-5 h-5 rounded-xl flex items-center justify-center">
+                <img class="rounded" src="https://pub-bd8291a7790f4b588b9daf7b1db26e25.r2.dev/app-image/ChatGPT%20Image%20Apr%2026%2C%202026%2C%2002_47_10%20PM.png" alt="">
+              </div>
             </div>
             <span class="text-xl font-bold text-gray-900">QuickField</span>
           </div>

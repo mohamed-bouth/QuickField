@@ -76,15 +76,6 @@
                     </div>
                 </div>
 
-                <div class="mt-6 grid grid-cols-2 gap-3">
-                    <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
-                        Google
-                    </a>
-                    <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
-                        Facebook
-                    </a>
-                </div>
-
                 <p class="mt-8 text-center text-sm text-gray-600">
                     Don't have an account? <a href="{{ route('register') }}" class="font-medium text-green-600 hover:text-green-500">Sign up</a>
                 </p>

@@ -65,4 +65,20 @@ class FieldController extends Controller
             })
         );
     }   
+
+    public function liveSearch(Request $request)
+    {
+        $query = $request->get('q');
+
+        if (empty($query)) {
+            return response()->json([]);
+        }
+
+        $fields = Field::where('name', 'LIKE', '%' . $query . '%')
+                    ->orWhere('localisation', 'LIKE', '%' . $query . '%')
+                    ->take(5)
+                    ->get(['id', 'name', 'localisation']);
+
+        return response()->json($fields);
+    }
 }
