@@ -15,7 +15,6 @@ class ReservationController extends Controller
 
         $reservations = Reservation::with(['user', 'field'])
             ->when($user->hasRole('super_admin'), function ($query) {
-                // no restriction
             })
 
             ->when($user->hasRole('field_manager'), function ($query) use ($user) {

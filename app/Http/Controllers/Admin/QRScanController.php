@@ -24,12 +24,12 @@ class QRScanController extends Controller
         $ticket = Ticket::where('qr_code_hash', $request->qr_code_hash)->first();
 
         if (!$ticket) {
-            return back()->with('error', 'Had l-code makaynch f système!');
+            return back()->with('error', 'their no Code like this in the system!');
         }
 
 
         if ($ticket->scan_status === 'scanned') {
-            return back()->with('error', 'Had ticket deja mscannya!');
+            return back()->with('error', 'the ticket has aready scanned!');
         }
 
         return redirect()->route('admin.scan-ticket.details', $ticket->qr_code_hash);
@@ -58,6 +58,6 @@ class QRScanController extends Controller
             'status' => 'completed'
         ]);
 
-        return redirect()->route('admin.scan-ticket.index')->with('success', 'T-valida l-match b naja7! Reservation Completed.');
+        return redirect()->route('admin.scan-ticket.index')->with('success', 'the Reservation Completed with success.');
     }
 }

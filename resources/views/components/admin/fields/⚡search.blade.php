@@ -44,19 +44,6 @@ new class extends Component {
                 class="pl-10 pr-4 h-10 w-full rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-green-500 outline-none"
             >
         </div>
-
-        <div class="flex items-center gap-3">
-            <button class="rounded-xl h-10 border border-gray-200 text-gray-600 bg-white shadow-sm gap-2 px-4 inline-flex items-center">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h18M6.75 12h10.5M10.5 19.5h3"/>
-                </svg>
-                <span>Filters</span>
-            </button>
-
-            <button class="rounded-xl h-10 border border-gray-200 text-gray-600 bg-white shadow-sm px-4 inline-flex items-center">
-                Export
-            </button>
-        </div>
     </div>
 
     <div class="overflow-x-auto">

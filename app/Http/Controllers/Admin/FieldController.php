@@ -22,8 +22,6 @@ class FieldController extends Controller
 
     public function store(Request $request)
     {
-        abort_unless($request->user()->hasRole('field_manager'), 403);
-
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'localisation' => 'required|string|max:255',
@@ -75,7 +73,6 @@ class FieldController extends Controller
 
     public function show(Request $request, Field $field)
     {
-        abort_unless($this->canAccessField($request, $field), 403);
 
         $field->load('fieldWorkHours');
 
@@ -85,7 +82,6 @@ class FieldController extends Controller
     public function edit(Request $request, $id)
     {
         $field = Field::findOrFail($id);
-        abort_unless($this->canAccessField($request, $field), 403);
 
         return view('admin.fields.edit', compact('field'));
     }
@@ -93,7 +89,6 @@ class FieldController extends Controller
     public function update(Request $request, $id)
     {
         $field = Field::findOrFail($id);
-        abort_unless($this->canAccessField($request, $field), 403);
 
         $isSuperAdmin = $request->user()->hasRole('super_admin');
 
@@ -143,7 +138,6 @@ class FieldController extends Controller
 
     public function updateValidation(Request $request, Field $field)
     {
-        abort_unless($request->user()->hasRole('super_admin'), 403);
 
         $validated = $request->validate([
             'status' => 'required|in:active,rejected',
@@ -161,7 +155,6 @@ class FieldController extends Controller
     public function destroy(Request $request, $id)
     {
         $field = Field::findOrFail($id);
-        abort_unless($this->canAccessField($request, $field), 403);
 
         if ($field->image_path) {
             Storage::disk('r2')->delete($field->image_path);
@@ -176,7 +169,6 @@ class FieldController extends Controller
 
     public function updatePlanning(Request $request, Field $field)
     {   
-        abort_unless($this->canAccessField($request, $field), 403);
 
         
         $validated = $request->validate([
@@ -208,14 +200,5 @@ class FieldController extends Controller
         }
 
         return back()->with('success', 'Planning updated successfully.');
-    }
-
-    private function canAccessField(Request $request, Field $field): bool
-    {
-        if ($request->user()->hasRole('super_admin')) {
-            return true;
-        }
-
-        return (int) $field->user_id === (int) $request->user()->id;
     }
 }
